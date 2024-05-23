@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 type bill struct {
 	name  string
@@ -36,7 +39,7 @@ func (b *bill) format() string {
 
 // update tip
 func (b *bill) updateTip(tip float64) {
-	b.tip = tip
+	(*b).tip = tip
 }
 
 // add items
@@ -45,6 +48,22 @@ func (b *bill) addItems(name string, price float64) {
 }
 
 // delete items
-func (b *bill) deleteItems(key string) {
-	delete(b.items, key)
+func (b *bill) deleteItems(key string) bool {
+	_, ok := b.items[key]
+	if ok {
+		delete(b.items, key)
+		return true
+	} else {
+		return false
+	}
+}
+
+// save bill
+func (b *bill) save() {
+	data := []byte(b.format())
+	err := os.WriteFile("bills/"+b.name+".txt", data, 0644)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Bill was saved in file")
 }
